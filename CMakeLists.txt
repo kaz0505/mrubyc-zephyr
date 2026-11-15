@@ -3,10 +3,13 @@
 cmake_minimum_required(VERSION 3.28.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(hello_world)
+project(mrubyc-zephyr)
 
 # Add mruby/c subdirectory
 add_subdirectory(mrubyc)
+
+# Link Zephyr interface to mruby for Zephyr headers
+target_link_libraries(mruby PUBLIC zephyr_interface)
 
 target_sources(app PRIVATE src/main.c)
 
