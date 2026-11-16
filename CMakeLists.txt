@@ -5,16 +5,35 @@ cmake_minimum_required(VERSION 3.28.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(mrubyc-zephyr)
 
-# Add mruby/c subdirectory
-add_subdirectory(mrubyc)
+target_sources(app PRIVATE
+	src/main.c
+	src/blink.c
+	mrubyc/src/alloc.c
+	mrubyc/src/c_array.c
+	mrubyc/src/c_hash.c
+	mrubyc/src/c_math.c
+	mrubyc/src/c_numeric.c
+	mrubyc/src/c_object.c
+	mrubyc/src/c_proc.c
+	mrubyc/src/c_range.c
+	mrubyc/src/c_string.c
+	mrubyc/src/c_task_queue.c
+	mrubyc/src/class.c
+	mrubyc/src/console.c
+	mrubyc/src/error.c
+	mrubyc/src/global.c
+	mrubyc/src/keyvalue.c
+	mrubyc/src/load.c
+	mrubyc/src/mrblib.c
+	mrubyc/src/rrt0.c
+	mrubyc/src/symbol.c
+	mrubyc/src/value.c
+	mrubyc/src/vm.c
+	mrubyc/hal/zephyr/hal.c
+)
 
-# Link Zephyr interface to mruby for Zephyr headers
-target_link_libraries(mruby PUBLIC zephyr_interface)
+target_include_directories(app PRIVATE
+	mrubyc/src
+	mrubyc/hal/zephyr
+)
 
-target_sources(app PRIVATE src/main.c)
-
-# Link mruby/c library
-target_link_libraries(app PUBLIC mruby)
-
-# Add mruby/c include directory to app
-target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/mrubyc)

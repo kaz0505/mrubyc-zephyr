@@ -4,31 +4,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <stdio.h>
+#include <stdint.h>
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
-#include <mrubyc.h>
+#include <zephyr/sys/printk.h>
+#include "mrubyc.h"
 
-#define LED0_NODE DT_ALIAS(led0)
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+#define MRBC_MEMORY_SIZE (1024 * 40)
+
+static uint8_t memory_pool[MRBC_MEMORY_SIZE] __aligned(4);
+extern const uint8_t blink[];
 
 int main(void)
 {
-	printf("Hello World! %s\n", CONFIG_BOARD_TARGET);
-	printf("mruby/c version: %s\n", MRUBYC_VERSION);
-
-	if (!gpio_is_ready_dt(&led)) {
-		return 0;
+	mrbc_init(memory_pool, MRBC_MEMORY_SIZE);
+	if (mrbc_create_task(blink, NULL) == NULL) {
+		printk("Failed to create mruby/c task\n");
+		return -1;
 	}
 
-	if (gpio_pin_configure_dt(&led, GPIO_OUTPUT_INACTIVE) < 0) {
-		return 0;
-	}
-
-	while (1) {
-		gpio_pin_toggle_dt(&led);
-		k_sleep(K_MSEC(500));
-	}
-
-	return 0;
+	return mrbc_run();
 }
